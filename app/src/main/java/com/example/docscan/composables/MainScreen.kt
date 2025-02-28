@@ -1,6 +1,7 @@
 package com.example.docscan.composables
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -9,12 +10,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.unit.dp
 import com.example.docscan.viewModel.CameraViewModel
 import org.opencv.core.Point
 
 @Composable
 fun MainScreen(viewModel: CameraViewModel) {
-    val edges by viewModel.edges.collectAsState()
     val capturedImage by viewModel.capturedImage.collectAsState()
     val isProcessing by viewModel.isProcessing.collectAsState()
 
@@ -35,7 +37,6 @@ fun MainScreen(viewModel: CameraViewModel) {
         } else {
             if (capturedImage == null || isProcessing) {
                 CameraPreviewScreen(viewModel)
-                BoundingBoxOverlay(edges)
             } else {
                 CapturedImageScreen(viewModel) {
                     viewModel.resetCapture()
@@ -45,23 +46,3 @@ fun MainScreen(viewModel: CameraViewModel) {
         }
     }
 }
-
-
-@Composable
-fun BoundingBoxOverlay(edges: List<Point>?) {
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        edges?.let { points ->
-            if (points.size == 4) {
-                for (i in 0..3) {
-                    drawLine(
-                        color = Color.Green,
-                        start = Offset(points[i].x.toFloat(), points[i].y.toFloat()),
-                        end = Offset(points[(i + 1) % 4].x.toFloat(), points[(i + 1) % 4].y.toFloat()),
-                        strokeWidth = 3f
-                    )
-                }
-            }
-        }
-    }
-}
-
